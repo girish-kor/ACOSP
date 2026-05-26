@@ -1,0 +1,124 @@
+# Docker Compose for ACOSP Platform
+# Production-grade orchestration with PostgreSQL + TimescaleDB
+
+version: "3.9"
+
+services:
+  # =========================================================================
+  # PostgreSQL + TimescaleDB — Time-series operational events & findings
+  # =========================================================================
+
+  timescaledb:
+    image: timescale/timescaledb-ha:latest-pg15
+    container_name: acosp-timescaledb
+    environment:
+      POSTGRES_DB: acosp
+      POSTGRES_USER: acosp
+      POSTGRES_PASSWORD: ${ACOSP_DB_PASSWORD:-changeme}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - timescaledb-data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/01-init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "acosp"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - acosp-network
+    restart: unless-stopped
+
+  # =========================================================================
+  # ACOSP Orchestrator — Main application
+  # =========================================================================
+
+  orchestrator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: acosp-orchestrator
+    environment:
+      # Platform settings
+      ACOSP_LOG_LEVEL: ${ACOSP_LOG_LEVEL:-INFO}
+      ACOSP_LOG_FORMAT: json
+      
+      # Database connection
+      ACOSP_DB_HOST: timescaledb
+      ACOSP_DB_PORT: 5432
+      ACOSP_DB_USER: acosp
+      ACOSP_DB_PASSWORD: ${ACOSP_DB_PASSWORD:-changeme}
+      ACOSP_DB_DATABASE: acosp
+      ACOSP_DB_POOL_SIZE: 10
+      
+      # LLM configuration
+      ACOSP_LLM_PROVIDER: ${ACOSP_LLM_PROVIDER:-anthropic}
+      ACOSP_LLM_API_KEY: ${ACOSP_LLM_API_KEY:-}
+      ACOSP_LLM_MODEL: ${ACOSP_LLM_MODEL:-claude-sonnet-4-20250514}
+      ACOSP_LLM_TEMPERATURE: 0.2
+      ACOSP_LLM_MAX_TOKENS: 4096
+      
+      # Mission configuration
+      ACOSP_MISSION_DEFAULT_INTENSITY: 2
+      ACOSP_MISSION_RISK_THRESHOLD: 0.75
+      ACOSP_MISSION_MAX_ITERATIONS: 10
+      
+      # Tools configuration
+      ACOSP_TOOLS_NMAP_BINARY: nmap
+      ACOSP_TOOLS_NMAP_TIMEOUT: 300
+      ACOSP_TOOLS_METASPLOIT_HOST: metasploit
+      ACOSP_TOOLS_METASPLOIT_PORT: 55553
+      
+      # Compliance settings
+      ACOSP_COMPLIANCE_DEFAULT_FRAMEWORK: NIST_CSF
+    volumes:
+      - ./config:/app/config:ro
+      - ./reports:/app/reports
+      - ./scripts:/app/scripts:ro
+    ports:
+      - "8000:8000"
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+    networks:
+      - acosp-network
+    restart: unless-stopped
+    # Security context — run as non-root
+    user: "1000:1000"
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+
+  # =========================================================================
+  # Optional: Metasploit RPC Server (if using external framework)
+  # =========================================================================
+
+  # metasploit:
+  #   image: metasploitframework/metasploit-framework:latest
+  #   container_name: acosp-metasploit
+  #   environment:
+  #     - MSF_DATABASE_POOL=10
+  #   ports:
+  #     - "55553:55553"
+  #   networks:
+  #     - acosp-network
+  #   restart: unless-stopped
+
+# ============================================================================
+# Volumes (persistent data)
+# ============================================================================
+
+volumes:
+  timescaledb-data:
+    driver: local
+
+# ============================================================================
+# Networks (service discovery)
+# ============================================================================
+
+networks:
+  acosp-network:
+    driver: bridge

@@ -1,0 +1,17 @@
+# Bandit Configuration (security scanning)
+# Reference: https://bandit.readthedocs.io/
+
+[bandit]
+exclude_dirs = ["tests", ".venv", "venv", "build", "dist"]
+tests = []
+skips = [
+    "B101",   # assert_used (acceptable in tests)
+    "B601",   # paramiko_calls (for SSH operations)
+]
+
+# Severity levels: LOW, MEDIUM, HIGH
+# Confidence levels: LOW, MEDIUM, HIGH
+
+[bandit.assert_used]
+# Allow assert in test files
+skips = ["tests/*"]

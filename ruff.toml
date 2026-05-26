@@ -1,0 +1,34 @@
+# Ruff Configuration (Python linter)
+# Reference: https://docs.astral.sh/ruff/
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort
+    "N",      # pep8-naming
+    "UP",     # pyupgrade
+    "S",      # flake8-bandit
+    "BLE",    # flake8-blind-except
+    "B",      # flake8-bugbear
+    "A",      # flake8-builtins
+    "C4",     # flake8-comprehensions
+    "SIM",    # flake8-simplify
+    "RUF",    # ruff-specific
+]
+
+ignore = [
+    "E501",   # Line too long (handled by formatter)
+]
+
+# Import sorting
+[tool.ruff.isort]
+known-first-party = ["src"]
+
+# Flake8-builtins overrides
+[tool.ruff.flake8-builtins]
+builtins-ignorelist = ["format"]

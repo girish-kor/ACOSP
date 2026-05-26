@@ -1,20 +1,41 @@
-# ---------------------------------------------------------------
-# ACOSP — Python dependencies
-# ---------------------------------------------------------------
-pydantic>=2.7.0
-langchain>=0.2.0
-sqlalchemy>=2.0.0
-networkx>=3.3
-scapy>=2.5.0
-structlog>=24.1.0
-pytest>=7.0.0
+# ACOSP — Python dependencies (pinned versions)
+# Generated from pyproject.toml with strict pinning for reproducibility
 
-# Optional extras (uncomment as needed)
-# psycopg2-binary>=2.9.9      # PostgreSQL driver
-# timescaledb-toolkit          # TimescaleDB helpers
-# boto3>=1.34.0                # AWS SDK
-# azure-identity>=1.15.0       # Azure SDK
-# google-cloud-compute>=1.14.0 # GCP SDK
-# metasploit-framework-rpc     # MSF RPC client
-# python-nmap>=0.7.1           # Nmap wrapper
+# Core framework
+pydantic==2.7.1
+pydantic-settings==2.2.1
+structlog==24.1.0
 
+# LLM & reasoning
+langchain==0.2.1
+langchain-anthropic==0.1.15
+
+# Data & persistence
+sqlalchemy==2.0.25
+psycopg2-binary==2.9.9
+
+# Network & discovery
+networkx==3.3
+scapy==2.5.0
+
+# Async utilities
+aiohttp==3.9.1
+python-dotenv==1.0.0
+
+# Development (optional)
+# pytest==7.4.4
+# pytest-asyncio==0.23.2
+# pytest-cov==4.1.0
+# pytest-mock==3.12.0
+# mypy==1.8.0
+# types-toml==0.10.8.20240310
+# ruff==0.3.0
+# bandit==1.7.5
+# black==24.1.1
+# isort==5.13.2
+
+# Cloud providers (optional)
+# boto3==1.34.12
+# azure-identity==1.15.0
+# azure-mgmt-compute==30.7.0
+# google-cloud-compute==1.14.0
