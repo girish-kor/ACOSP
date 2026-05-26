@@ -1,10 +1,3 @@
-"""
-pyproject.toml — ACOSP Build Configuration & Dependency Management
-===================================================================
-Strict versioning, development tooling, testing, and build configuration
-for the ACOSP platform using modern Python packaging standards.
-"""
-
 [build-system]
 requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
@@ -98,29 +91,27 @@ plugins = ["pydantic.mypy", "sqlalchemy.ext.mypy.plugin"]
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+
+[tool.ruff.lint]
 select = [
-    "E",      # pycodestyle errors
-    "W",      # pycodestyle warnings
-    "F",      # pyflakes
-    "I",      # isort
-    "N",      # pep8-naming
-    "UP",     # pyupgrade
-    "S",      # flake8-bandit
-    "BLE",    # flake8-blind-except
-    "B",      # flake8-bugbear
-    "A",      # flake8-builtins
-    "C4",     # flake8-comprehensions
-    "SIM",    # flake8-simplify
-    "RUF",    # ruff-specific rules
+    "E",
+    "W",
+    "F",
+    "I",
+    "N",
+    "UP",
+    "S",
+    "BLE",
+    "B",
+    "A",
+    "C4",
+    "SIM",
+    "RUF",
 ]
-ignore = ["E501"]  # Line too long (handled by formatter)
+ignore = ["E501"]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["src"]
-
-[tool.bandit]
-exclude_dirs = ["tests", ".venv", "venv"]
-skips = []
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -152,20 +143,6 @@ exclude_lines = [
 [tool.black]
 line-length = 100
 target-version = ["py311"]
-include = '\.pyi?$'
-extend-exclude = '''
-/(
-  # directories
-  \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | build
-  | dist
-)/
-'''
 
 [tool.isort]
 profile = "black"

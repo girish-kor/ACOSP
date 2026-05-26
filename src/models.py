@@ -8,13 +8,13 @@ compliance artifacts.
 
 from __future__ import annotations
 
-from enum import Enum
-from typing import Any, Optional
+from enum import StrEnum
+from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
 
 
-class ComplianceFramework(str, Enum):
+class ComplianceFramework(StrEnum):
     """Supported compliance framework identifiers."""
 
     SOC2 = "SOC2"
@@ -24,7 +24,7 @@ class ComplianceFramework(str, Enum):
     PCI_DSS = "PCI_DSS"
 
 
-class SeverityLevel(str, Enum):
+class SeverityLevel(StrEnum):
     """Standard severity classification."""
 
     CRITICAL = "CRITICAL"
@@ -38,10 +38,10 @@ class DiscoveryModel(BaseModel):
     """Discovered asset representation."""
 
     ip: str
-    hostname: Optional[str] = None
+    hostname: str | None = None
     open_ports: list[int] = Field(default_factory=list)
-    os_guess: Optional[str] = None
-    mac_address: Optional[str] = None
+    os_guess: str | None = None
+    mac_address: str | None = None
     tags: list[str] = Field(default_factory=list)
 
     @field_validator("ip")
@@ -58,9 +58,9 @@ class ServiceFingerprint(BaseModel):
 
     port: int
     protocol: str
-    service_name: Optional[str] = None
-    product: Optional[str] = None
-    version: Optional[str] = None
+    service_name: str | None = None
+    product: str | None = None
+    version: str | None = None
     cpe: list[str] = Field(default_factory=list)
     banners: dict[str, str] = Field(default_factory=dict)
 
@@ -69,9 +69,9 @@ class AssetFingerprint(BaseModel):
     """Complete fingerprint for a discovered asset."""
 
     ip: str
-    os: Optional[str] = None
-    os_family: Optional[str] = None
-    os_version: Optional[str] = None
+    os: str | None = None
+    os_family: str | None = None
+    os_version: str | None = None
     services: list[ServiceFingerprint] = Field(default_factory=list)
     tls_certs: dict[int, str] = Field(default_factory=dict)
 
@@ -79,13 +79,13 @@ class AssetFingerprint(BaseModel):
 class VulnerabilityData(BaseModel):
     """CVE/vulnerability record."""
 
-    cve_id: Optional[str] = None
-    cwe_id: Optional[str] = None
+    cve_id: str | None = None
+    cwe_id: str | None = None
     title: str
-    description: Optional[str] = None
+    description: str | None = None
     severity: SeverityLevel
-    cvss_score: Optional[float] = Field(None, ge=0.0, le=10.0)
-    epss_score: Optional[float] = Field(None, ge=0.0, le=1.0)
+    cvss_score: float | None = Field(None, ge=0.0, le=10.0)
+    epss_score: float | None = Field(None, ge=0.0, le=1.0)
     cpe: list[str] = Field(default_factory=list)
     kev: bool = False
     exploit_available: bool = False
@@ -123,7 +123,7 @@ class TelemetryEvent(BaseModel):
     level: str
     message: str
     context: dict[str, Any] = Field(default_factory=dict)
-    exception: Optional[dict[str, str]] = None
+    exception: dict[str, str] | None = None
 
 
 class FindingRecord(BaseModel):
@@ -132,13 +132,13 @@ class FindingRecord(BaseModel):
     session_id: str
     trace_id: str
     target_ip: str
-    target_port: Optional[int] = None
-    cve_id: Optional[str] = None
+    target_port: int | None = None
+    cve_id: str | None = None
     title: str
     severity: SeverityLevel
-    cvss_score: Optional[float] = Field(None, ge=0.0, le=10.0)
+    cvss_score: float | None = Field(None, ge=0.0, le=10.0)
     evidence: str
-    remediation: Optional[str] = None
+    remediation: str | None = None
     timestamp: str  # ISO 8601
 
 
@@ -149,7 +149,7 @@ class ComplianceControl(BaseModel):
     control_name: str
     status: str
     related_findings: list[str] = Field(default_factory=list)
-    gap_description: Optional[str] = None
+    gap_description: str | None = None
 
 
 class ComplianceReport(BaseModel):

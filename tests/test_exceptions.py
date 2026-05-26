@@ -4,9 +4,6 @@ tests/test_exceptions.py — Exception & Retry Decorator Tests
 Tests for exception hierarchy and retry logic.
 """
 
-import asyncio
-import time
-
 import pytest
 
 from src.exceptions import (

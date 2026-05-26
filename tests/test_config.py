@@ -4,8 +4,6 @@ tests/test_config.py — Configuration Management Tests
 Tests for environment-driven configuration with pydantic-settings.
 """
 
-import os
-
 import pytest
 
 from src.config import ACOSPConfig, DatabaseSettings, LLMSettings

@@ -1,10 +1,7 @@
-# Ruff Configuration (Python linter)
-# Reference: https://docs.astral.sh/ruff/
-
-[tool.ruff]
 line-length = 100
 target-version = "py311"
 
+[lint]
 select = [
     "E",      # pycodestyle errors
     "W",      # pycodestyle warnings
@@ -20,15 +17,7 @@ select = [
     "SIM",    # flake8-simplify
     "RUF",    # ruff-specific
 ]
+ignore = ["E501"]
 
-ignore = [
-    "E501",   # Line too long (handled by formatter)
-]
-
-# Import sorting
-[tool.ruff.isort]
+[lint.isort]
 known-first-party = ["src"]
-
-# Flake8-builtins overrides
-[tool.ruff.flake8-builtins]
-builtins-ignorelist = ["format"]

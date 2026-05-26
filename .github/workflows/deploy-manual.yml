@@ -1,0 +1,154 @@
+name: Manual Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      image_tag:
+        description: 'Docker image tag to deploy'
+        required: false
+        default: 'latest'
+      replicas:
+        description: 'Number of replicas'
+        required: false
+        default: '3'
+        type: string
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  deploy:
+    name: Deploy to ${{ github.event.inputs.environment }}
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event.inputs.environment }}
+      url: https://${{ github.event.inputs.environment }}.acosp.internal
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deployment Parameters
+        run: |
+          echo "## 🚀 Deployment Parameters" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment**: ${{ github.event.inputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Image Tag**: ${{ github.event.inputs.image_tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Replicas**: ${{ github.event.inputs.replicas }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Triggered by**: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Configure kubectl
+        run: |
+          mkdir -p $HOME/.kube
+          # TODO: Configure kubectl with appropriate credentials
+          # - Load kubeconfig for target environment
+          # - Verify cluster connectivity
+          kubectl cluster-info
+
+      - name: Update Kubernetes manifests
+        run: |
+          echo "Updating manifests for ${{ github.event.inputs.environment }}..."
+          # TODO: Implement manifest updates
+          # - Update image reference
+          # - Update replicas
+          # - Update resource limits
+          # - Update environment variables
+
+      - name: Deploy with Helm
+        run: |
+          helm repo add acosp ${{ secrets.HELM_REPO_URL }}
+          helm repo update
+          
+          helm upgrade --install acosp acosp/acosp \
+            --namespace acosp \
+            --create-namespace \
+            --values values-${{ github.event.inputs.environment }}.yaml \
+            --set image.tag=${{ github.event.inputs.image_tag }} \
+            --set replicaCount=${{ github.event.inputs.replicas }} \
+            --wait \
+            --timeout 5m
+        continue-on-error: true
+
+      - name: Verify deployment
+        run: |
+          kubectl rollout status deployment/acosp -n acosp --timeout=5m
+          kubectl get deployment,pods,svc -n acosp
+
+      - name: Run health checks
+        run: |
+          echo "Running health checks..."
+          # TODO: Implement health checks
+          # - Check pod readiness
+          # - Verify service endpoints
+          # - Run connectivity tests
+          # - Execute smoke tests
+
+      - name: Notify deployment
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: |
+            Deployment to ${{ github.event.inputs.environment }}: ${{ job.status }}
+            Triggered by: ${{ github.actor }}
+            Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.inputs.image_tag }}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        continue-on-error: true
+
+      - name: Create deployment record
+        if: always()
+        run: |
+          cat > deployment-record.txt << EOF
+          Deployment Record
+          ==================
+          Environment: ${{ github.event.inputs.environment }}
+          Image Tag: ${{ github.event.inputs.image_tag }}
+          Replicas: ${{ github.event.inputs.replicas }}
+          Deployed At: $(date -u +'%Y-%m-%dT%H:%M:%SZ')
+          Deployed By: ${{ github.actor }}
+          Commit SHA: ${{ github.sha }}
+          Commit URL: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}
+          Status: ${{ job.status }}
+          EOF
+          cat deployment-record.txt
+
+      - name: Upload deployment record
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: deployment-record-${{ github.event.inputs.environment }}-${{ github.run_id }}
+          path: deployment-record.txt
+
+  rollback:
+    name: Rollback Option
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: failure()
+    environment:
+      name: ${{ github.event.inputs.environment }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rollback deployment
+        run: |
+          echo "Initiating rollback..."
+          # TODO: Implement rollback logic
+          # - Restore previous deployment
+          # - Revert database migrations if applicable
+          # - Verify service health
+
+      - name: Notify rollback
+        uses: 8398a7/action-slack@v3
+        with:
+          status: 'warning'
+          text: 'Deployment rollback initiated for ${{ github.event.inputs.environment }}'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        continue-on-error: true

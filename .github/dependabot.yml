@@ -1,0 +1,107 @@
+version: 2
+updates:
+  # =====================================================================
+  # Python Dependencies
+  # =====================================================================
+
+  - package-ecosystem: 'pip'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '03:00'
+    open-pull-requests-limit: 5
+    reviewers:
+      - 'team:maintainers'
+    labels:
+      - 'dependencies'
+      - 'python'
+    commit-message:
+      prefix: 'chore'
+      prefix-scope: 'deps'
+      include: 'scope'
+    pull-request-branch-name:
+      separator: '/'
+    rebase-strategy: 'auto'
+    insecure-external-code-execution: 'deny'
+
+  # =====================================================================
+  # Docker
+  # =====================================================================
+
+  - package-ecosystem: 'docker'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '04:00'
+    open-pull-requests-limit: 3
+    reviewers:
+      - 'team:maintainers'
+    labels:
+      - 'dependencies'
+      - 'docker'
+    commit-message:
+      prefix: 'chore'
+      prefix-scope: 'docker'
+      include: 'scope'
+
+  # =====================================================================
+  # GitHub Actions
+  # =====================================================================
+
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'tuesday'
+      time: '04:00'
+    open-pull-requests-limit: 3
+    reviewers:
+      - 'team:maintainers'
+    labels:
+      - 'ci/cd'
+      - 'github-actions'
+    commit-message:
+      prefix: 'ci'
+      prefix-scope: 'actions'
+      include: 'scope'
+
+  # =====================================================================
+  # Version Updates
+  # =====================================================================
+
+  - package-ecosystem: 'pip'
+    directory: '/'
+    target-branch: 'develop'
+    schedule:
+      interval: 'monthly'
+      day: 'first'
+    allow:
+      - dependency-type: 'direct'
+        update-types:
+          - 'major'
+    open-pull-requests-limit: 2
+    reviewers:
+      - 'team:maintainers'
+    labels:
+      - 'release'
+      - 'breaking-changes'
+    commit-message:
+      prefix: 'chore'
+      prefix-scope: 'deps'
+
+# =====================================================================
+# Global Configuration
+# =====================================================================
+
+version-updates:
+  - package-ecosystem: 'pip'
+    enable: true
+
+registries:
+  python-registry:
+    type: 'python-index'
+    url: 'https://pypi.org/simple'
+    username: 'username'
+    password: '${{ secrets.PYPI_PASSWORD }}'

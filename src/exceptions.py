@@ -7,9 +7,10 @@ Centralized exception types with context preservation and retry semantics.
 from __future__ import annotations
 
 import functools
-import random
+import secrets
 import time
-from typing import Any, Callable, TypeVar
+from collections.abc import Callable
+from typing import Any, TypeVar
 
 import structlog
 
@@ -18,7 +19,7 @@ logger: structlog.BoundLogger = structlog.get_logger(__name__)
 T = TypeVar("T")
 
 
-class ACOSPException(Exception):
+class ACOSPError(Exception):
     """Base exception for all ACOSP errors."""
 
     def __init__(self, message: str, context: dict[str, Any] | None = None):
@@ -35,55 +36,55 @@ class ACOSPException(Exception):
         self.context = context or {}
 
 
-class ConfigurationError(ACOSPException):
+class ConfigurationError(ACOSPError):
     """Configuration loading or validation failed."""
 
     pass
 
 
-class DiscoveryError(ACOSPException):
+class DiscoveryError(ACOSPError):
     """Asset discovery operation failed."""
 
     pass
 
 
-class FingerprintingError(ACOSPException):
+class FingerprintingError(ACOSPError):
     """Service fingerprinting operation failed."""
 
     pass
 
 
-class PlanningError(ACOSPException):
+class PlanningError(ACOSPError):
     """Attack plan generation failed."""
 
     pass
 
 
-class ValidationError(ACOSPException):
+class ValidationError(ACOSPError):
     """Risk validation or plan validation failed."""
 
     pass
 
 
-class ExecutionError(ACOSPException):
+class ExecutionError(ACOSPError):
     """Exploit execution failed."""
 
     pass
 
 
-class ToolDispatchError(ACOSPException):
+class ToolDispatchError(ACOSPError):
     """External tool execution failed."""
 
     pass
 
 
-class TelemetryError(ACOSPException):
+class TelemetryError(ACOSPError):
     """Telemetry operation failed."""
 
     pass
 
 
-class DatabaseError(ACOSPException):
+class DatabaseError(ACOSPError):
     """Database operation failed."""
 
     pass
@@ -153,7 +154,7 @@ def retry_with_backoff(
 
                     # Calculate delay with optional jitter
                     if jitter:
-                        delay = min(current_delay * random.uniform(0.8, 1.2), max_delay)
+                        delay = min(current_delay * (0.8 + secrets.SystemRandom().random() * 0.4), max_delay)
                     else:
                         delay = min(current_delay, max_delay)
 
@@ -223,7 +224,7 @@ def async_retry_with_backoff(
                         raise
 
                     if jitter:
-                        delay = min(current_delay * random.uniform(0.8, 1.2), max_delay)
+                        delay = min(current_delay * (0.8 + secrets.SystemRandom().random() * 0.4), max_delay)
                     else:
                         delay = min(current_delay, max_delay)
 

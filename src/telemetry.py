@@ -14,12 +14,10 @@ Storage Backend
 from __future__ import annotations
 
 import datetime
-import json
 from typing import Any
 
 import structlog
 from sqlalchemy import create_engine, text
-from sqlalchemy.orm import Session
 
 logger: structlog.BoundLogger = structlog.get_logger(__name__)
 
@@ -55,7 +53,7 @@ def initialize_database(connection_string: str) -> None:
     This function is safe to call multiple times; subsequent calls become
     no-ops if the engine is already initialised and the schema is current.
     """
-    global _engine  # noqa: PLW0603
+    global _engine
 
     if _engine is not None:
         logger.debug("database_already_initialised")

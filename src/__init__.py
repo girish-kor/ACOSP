@@ -17,7 +17,7 @@ from src.async_orchestrator import (
     run_mission_async,
 )
 from src.config import ACOSPConfig
-from src.exceptions import ACOSPException
+from src.exceptions import ACOSPError
 from src.models import (
     AttackPlanSchema,
     ComplianceFramework,
@@ -36,7 +36,7 @@ from src.observability import (
 
 __all__ = [
     "ACOSPConfig",
-    "ACOSPException",
+    "ACOSPError",
     "AttackPlanSchema",
     "ComplianceFramework",
     "DiscoveryModel",

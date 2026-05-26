@@ -15,8 +15,8 @@ Integration Points
 
 from __future__ import annotations
 
+import contextlib
 import ipaddress
-import json
 from typing import Any
 
 import networkx as nx
@@ -58,11 +58,8 @@ def perform_reconnaissance(scope: str) -> list[dict[str, Any]]:
     logger.info("recon_started", scope=scope)
 
     # Validate scope
-    try:
+    with contextlib.suppress(ValueError):
         ipaddress.ip_network(scope, strict=False)
-    except ValueError:
-        # Not a CIDR — treat as domain; let DNS enumeration proceed
-        pass
 
     # TODO: invoke passive recon (Amass, subfinder, CT logs)
     # TODO: invoke active scan (python-nmap wrapper)
@@ -253,7 +250,7 @@ def query_vulnerability_databases(
 
     vulnerabilities: list[dict[str, Any]] = []
 
-    for cpe in service_info.get("cpe", []):
+    for _cpe in service_info.get("cpe", []):
         # TODO: query NVD API v2: https://services.nvd.nist.gov/rest/json/cves/2.0
         # TODO: check CISA KEV feed: https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json
         # TODO: merge EPSS scores from https://api.first.org/data/v1/epss

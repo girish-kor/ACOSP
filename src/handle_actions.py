@@ -13,10 +13,7 @@ token.  Unauthorised invocation raises :class:`PermissionError`.
 
 from __future__ import annotations
 
-import shlex
 import subprocess
-import uuid
-from pathlib import Path
 from typing import Any
 
 import structlog
@@ -113,7 +110,7 @@ def dispatch_tool(tool_name: str, arguments: dict[str, Any]) -> str:
         target: str = arguments.get("target", "")
         flags: list[str] = arguments.get("flags", ["-sV"])
         cmd = ["nmap", *flags, target]
-        result = subprocess.run(
+        result = subprocess.run(  # noqa: S603
             cmd,
             capture_output=True,
             text=True,

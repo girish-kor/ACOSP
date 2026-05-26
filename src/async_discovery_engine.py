@@ -14,7 +14,7 @@ import networkx as nx
 import structlog
 
 from src.exceptions import DiscoveryError, FingerprintingError
-from src.models import AssetFingerprint, DiscoveryModel, ServiceFingerprint
+from src.models import AssetFingerprint, DiscoveryModel
 
 logger: structlog.BoundLogger = structlog.get_logger(__name__)
 

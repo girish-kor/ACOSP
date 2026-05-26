@@ -7,7 +7,6 @@ Async version of the main orchestration loop with concurrent agent coordination.
 from __future__ import annotations
 
 import asyncio
-from pathlib import Path
 from typing import Any
 
 import structlog
@@ -19,8 +18,7 @@ from src.async_discovery_engine import (
 )
 from src.config import ACOSPConfig
 from src.exceptions import PlanningError, ValidationError
-from src.models import AttackPlanSchema
-from src.observability import generate_trace_id, set_trace_id
+from src.observability import generate_trace_id
 
 logger: structlog.BoundLogger = structlog.get_logger(__name__)
 
@@ -51,7 +49,7 @@ async def run_mission_async(
         If intensity_level is out of range.
     """
     if not (1 <= intensity_level <= 5):
-        raise ValueError(f"intensity_level must be 1–5, got {intensity_level}")
+        raise ValueError(f"intensity_level must be 1-5, got {intensity_level}")
 
     trace_id = generate_trace_id()
     logger.info(
@@ -273,6 +271,6 @@ async def execute_exploit_chain_async(
         # TODO: parallel tool dispatch with semaphore control
         await asyncio.sleep(0.1)  # Placeholder
         return True
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001
         logger.error("exploit_chain_async_failed", error=str(exc))
         return False

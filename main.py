@@ -18,7 +18,7 @@ import structlog
 
 from src.async_orchestrator import run_mission_async
 from src.config import ACOSPConfig
-from src.exceptions import ACOSPException
+from src.exceptions import ACOSPError
 from src.observability import configure_logging, generate_trace_id, set_trace_id
 
 logger: structlog.BoundLogger = structlog.get_logger(__name__)
@@ -50,7 +50,7 @@ def initialize_session(config_path: str) -> tuple[str, ACOSPConfig]:
     try:
         config = ACOSPConfig.from_toml(str(cfg_path))
     except Exception as exc:
-        raise ACOSPException(
+        raise ACOSPError(
             f"Failed to load configuration from {config_path}: {exc}",
             context={"config_path": str(cfg_path)},
         ) from exc
@@ -234,7 +234,7 @@ async def amain(argv: list[str] | None = None) -> int:
 
         return 0
 
-    except ACOSPException as exc:
+    except ACOSPError as exc:
         logger.error("acosp_exception", error=str(exc), context=exc.context)
         return 1
     except Exception as exc:
