@@ -1,0 +1,32 @@
+[platform]
+name = "ACOSP"
+version = "0.1.0"
+log_level = "INFO"
+report_output_dir = "reports/"
+
+[mission]
+default_intensity = 2
+risk_threshold = 0.75
+max_iterations = 10
+
+[database]
+host = "localhost"
+port = 5432
+user = "acosp"
+password = "changeme"
+database = "acosp"
+
+[llm]
+provider = "anthropic"
+model = "claude-sonnet-4-20250514"
+temperature = 0.2
+max_tokens = 4096
+
+[tools]
+nmap_binary = "nmap"
+metasploit_host = "127.0.0.1"
+metasploit_port = 55553
+custom_exploit_dir = "exploits/"
+
+[compliance]
+default_framework = "NIST_CSF"
